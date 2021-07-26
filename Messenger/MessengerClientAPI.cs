@@ -33,8 +33,9 @@ namespace Messenger
             reader.Close();
             DataStream.Close();
             response.Close();
-            if(status.ToLower() == "ok" && responseFromServer != "Have no messages!")
+            if((status.ToLower() == "ok") && (responseFromServer != "No"))
             {
+                //Console.WriteLine(responseFromServer + "!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 Message deserializedMsg = JsonConvert.DeserializeObject<Message>(responseFromServer);
                 return deserializedMsg;
             }
@@ -58,6 +59,7 @@ namespace Messenger
             string responseFromServer = reader.ReadToEnd();
             reader.Close();
             dataStream.Close();
+            response.Close();
             return true;
         }
 

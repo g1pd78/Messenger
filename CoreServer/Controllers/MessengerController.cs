@@ -21,11 +21,11 @@ namespace CoreServer.Controllers
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            string outputString = "Have no messages!";
+            string outputString = "No";
 
             if (id < ListOfMessages.Count && id >= 0)
                 outputString = JsonConvert.SerializeObject(ListOfMessages[id]);
-            Console.WriteLine(String.Format("Message № {0} : {1}", id, outputString));
+           // Console.WriteLine(String.Format("Message № {0} : {1}", id, outputString));
 
             return outputString;
         }

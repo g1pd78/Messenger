@@ -42,10 +42,15 @@ namespace Messenger
             Console.WriteLine("Input your name:");
             UserName = Console.ReadLine();
             string messageText = ""; ;
-            while(messageText != "Exit")
+            while (messageText != "Exit")
             {
-                Message sendMsg = new Message(UserName, messageText, DateTime.Now);
-                API.SendMessage(sendMsg);
+                GetNewMessage();
+                messageText = Console.ReadLine();
+                if (messageText.Length > 1)
+                {
+                    Message sendMsg = new Message(UserName, messageText, DateTime.Now);
+                    API.SendMessage(sendMsg);
+                }
             }
         }
     }
