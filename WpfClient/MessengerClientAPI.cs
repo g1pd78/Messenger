@@ -6,12 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.IO;
+using System.Net.Http;
+using RestSharp;
 
 namespace Messenger
 {
     class MessengerClientAPI
     {
- 
+        private static readonly HttpClient client = new HttpClient();
         void TestJSON()
         {
             Message msg = new Message("g1pd78", "Hey", DateTime.UtcNow);
@@ -42,6 +44,17 @@ namespace Messenger
             return null;
         }
 
+        public async Task<Message> GetMessageHTTPAsync(int MessageId)
+        {
+            var responseStr = await client.GetStringAsync("http://localhost:5000/api/Messenger/" + MessageId.ToString());
+            if(responseStr != null)
+            {
+                Message deserializedMsg = JsonConvert.DeserializeObject<Message>(responseStr);
+                return deserializedMsg;
+            }
+            return null;
+        }
+
 
         public bool SendMessage(Message msg)
         {
@@ -62,6 +75,48 @@ namespace Messenger
             dataStream.Close();
             response.Close();
             return true;
+        }
+
+        public Message GetMessageRestSharp(int MessageID)
+        {
+            string mesURL = "http://localhost:5000/";
+            var client = new RestClient(mesURL);
+            var request = new RestRequest("/api/Messenger/" + MessageID, Method.GET);
+            IRestResponse<Message> Response = client.Execute<Message>(request);
+            string responseContent = Response.Content;
+            Message deserializedMsg = JsonConvert.DeserializeObject<Message>(responseContent);
+            return deserializedMsg;
+        }
+
+        public bool SendMessageRestSharp(Message msg)
+        {
+            string mesURL = "http://localhost:5000";
+            var client = new RestClient(mesURL);
+            var request = new RestRequest("/api/Messenger/", Method.POST);
+            /////IRestResponse<Message> response = client.Execute<Message>(request);
+            string output = JsonConvert.SerializeObject(msg);
+            request.AddParameter("application/json; charset=utf-8", output, ParameterType.RequestBody);
+            request.RequestFormat = DataFormat.Json;
+            bool exit = false;
+            try
+            {
+                client.ExecuteAsync(request, response =>
+                {
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        exit = true;
+                    }
+                    else
+                    {
+                        exit = false;
+                    }
+                });
+            }
+            catch(Exception error)
+            {
+                Console.WriteLine(error);
+            }
+            return exit;
         }
 
     }
